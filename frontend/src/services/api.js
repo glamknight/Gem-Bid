@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://gem-bid-compliance.onrender.com";
 
 // Fallback Mock Data for instant offline demonstrations if backend is starting up
 export const SAMPLE_BIDS_CATALOG = [
