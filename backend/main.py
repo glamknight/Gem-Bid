@@ -11,7 +11,7 @@ import hashlib
 import pdfplumber
 from fastapi import FastAPI, HTTPException, UploadFile, File, status
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field
 
 from database import init_db, get_db_connection, get_all_evaluations, update_bid_decision
 
@@ -47,10 +47,13 @@ app = FastAPI(
     lifespan=app_lifespan
 )
 class LoginRequest(BaseModel):
-    email: EmailStr
+    email: str
     password: str
 
 DEMO_OFFICER = { "officer@gem.gov.in": {
+    "password": "securepass", "name": "Rajesh Kumar", "role": "Senior Procurement Officer", "officer_id": "GEM-PO-2026"
+},
+                "GEM-PO-2026": {
     "password": "securepass", "name": "Rajesh Kumar", "role": "Senior Procurement Officer", "officer_id": "GEM-PO-2026"
 }}
 
@@ -231,7 +234,7 @@ class ChatRequest(BaseModel):
     question: str
     filename: Optional[str] = None
     
-@app.post("/api/login/")
+@app.post("/api/login")
 def login(request: LoginRequest):
     officer = DEMO_OFFICER.get(request.email)
     if officer and officer["password"] == request.password:

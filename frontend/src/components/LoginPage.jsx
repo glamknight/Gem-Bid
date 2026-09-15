@@ -19,7 +19,7 @@ export default function LoginPage({ onLogin }) {
     try {
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://gem-bid-compliance.onrender.com';
 
-      const response = await fetch(`${API_BASE_URL}/api/login/`, {
+      const response = await fetch(`${API_BASE_URL}/api/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -44,7 +44,7 @@ export default function LoginPage({ onLogin }) {
         setError(data.detail || 'Login failed');
       }
     } catch (err) {
-      setError('err.message');
+      setError(err.message);
     }
   };
 
