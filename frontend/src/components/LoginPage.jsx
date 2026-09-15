@@ -7,19 +7,45 @@ export default function LoginPage({ onLogin }) {
   const [selectedRole, setSelectedRole] = useState('Senior Procurement Officer (Tender Authority)');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!officerId.trim()) {
-      setError('Please enter your Officer ID or Official Gov Email');
+    setError('');
+
+    if (!officerId.trim() || !password) {
+      setError('Please fill in all fields');
       return;
     }
-    onLogin({
-      id: officerId,
-      name: officerId === 'GEM-PO-2026' ? 'Rajesh Kumar' : 'Procurement Officer',
-      role: selectedRole,
-      department: 'Ministry of Commerce & Industry',
-      clearance: 'Level-3 Tender Authority'
-    });
+
+    try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://gem-bid-compliance.onrender.com';
+
+      const response = await fetch(`${API_BASE_URL}/api/login/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: officerId,
+          password: password
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        onLogin({
+          id: data.officer_id,
+          name: data.officer_name,
+          role: data.role,
+          department: 'Ministry of Commerce & Industry',
+          clearance: 'Level-3 Tender Authority'
+        });
+      } else {
+        setError(data.detail || 'Login failed');
+      }
+    } catch (err) {
+      setError('err.message');
+    }
   };
 
   const handleQuickDemoLogin = () => {

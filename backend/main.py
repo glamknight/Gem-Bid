@@ -9,9 +9,9 @@ from typing import Optional, List
 import hashlib
 
 import pdfplumber
-from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi import FastAPI, HTTPException, UploadFile, File, status
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, Field
 
 from database import init_db, get_db_connection, get_all_evaluations, update_bid_decision
 
@@ -46,6 +46,13 @@ app = FastAPI(
     version="1.0.0",
     lifespan=app_lifespan
 )
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
+
+DEMO_OFFICER = { "officer@gem.gov.in": {
+    "password": "securepass", "name": "Rajesh Kumar", "role": "Senior Procurement Officer", "officer_id": "GEM-PO-2026"
+}}
 
 # Enable CORS for frontend integration
 app.add_middleware(
@@ -223,7 +230,20 @@ class DecisionUpdate(BaseModel):
 class ChatRequest(BaseModel):
     question: str
     filename: Optional[str] = None
-
+    
+@app.post("/api/login/")
+def login(request: LoginRequest):
+    officer = DEMO_OFFICER.get(request.email)
+    if officer and officer["password"] == request.password:
+        return {
+            "success": True,
+            "message": "Login successful",
+            "officer_name": officer["name"],
+            "role": officer["role"],
+            "officer_id": officer["officer_id"]
+        }
+    else:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
 
 # Endpoints
 @app.get("/")
