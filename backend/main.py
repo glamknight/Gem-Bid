@@ -235,6 +235,7 @@ class ChatRequest(BaseModel):
     filename: Optional[str] = None
     
 @app.post("/api/login")
+@app.post("/api/login/")
 def login(request: LoginRequest):
     officer = DEMO_OFFICER.get(request.email)
     if officer and officer["password"] == request.password:
